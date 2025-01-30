@@ -14,8 +14,8 @@ async def cmd_start(message: Message):
 @router.message(Command('help'))
 async def cmd_help(message: Message):
     await message.reply(
-        f"You can use:\n"
-        f"/start - start"
+        f"Вы можете использовать:\n"
+        f"/set_profile  - Настройка профиля"
         f"/form - example dialog"
         f"/keyboard - example button"
         f"/joke - get a random joke"

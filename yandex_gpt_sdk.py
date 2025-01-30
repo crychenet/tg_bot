@@ -2,8 +2,8 @@ import asyncio
 import os.path
 import aiofiles
 import json
+import datetime
 from typing import Dict, Any, List, Literal
-from dataclasses import dataclass
 from collections import deque
 from yandex_cloud_ml_sdk import AsyncYCloudML
 
@@ -14,12 +14,6 @@ PATH_TO_SYSTEM_PROMPT = 'example_yandex_gpt_prompt/system_text.json'
 PATH_TO_BASE_USERS_INFO = 'user_info'
 
 active_user_GPT_session = {}
-
-
-# @dataclass
-# class UserGPTSession:
-#     user_id: int
-#     session_instance: UserChatSession
 
 
 class StorageManager:
@@ -70,6 +64,7 @@ class UserChatSession:
         self.path_to_base_user_info = path_to_base_user_info
         self.chat_instance = ChatWithYandexGPT(system_prompt)
         self.last_responses = deque(base_user_info.get('last_responses', []), maxlen=5)
+        self.last_activity = datetime.datetime.now()
 
     @classmethod
     async def create(cls, model: AsyncYCloudML, path_to_system_prompt: str, path_to_base_user_info: str):
@@ -100,6 +95,7 @@ class UserChatSession:
             message=query,
         )
         self.last_responses.append({"role": "assistant", "text": response.alternatives[0].text})
+        self.last_activity = datetime.datetime.now()
         return response
 
 
@@ -123,13 +119,34 @@ async def get_user_session(user_id: int, model: AsyncYCloudML):
     return active_user_GPT_session[user_id]
 
 
+async def check_activity_session():
+    """delay in seconds"""
+    global active_user_GPT_session
+    time_now = datetime.datetime.now()
+
+    inactive_users = [
+        user_id for user_id, session in active_user_GPT_session.items()
+        if time_now - session.last_activity > datetime.timedelta(minutes=30)
+    ]
+
+    for user_id in inactive_users:
+        await active_user_GPT_session[user_id].save_session()
+        del active_user_GPT_session[user_id]
+
+
+async def start_session_cleaner():
+    while True:
+        await check_activity_session()
+        await asyncio.sleep(600)
+
+
 # async def main(message: str, type_message: str):
 #     model = start_model()
 #     chat = await get_user_session(user_id=15523, model=model)
 #     query = chat.handle_create_query(message=message, type_message=type_message)
 #     response = await chat.handle_send_message(query)
 #     print(response)
-#     query = chat.handle_create_query(message='Сколько коллорий в 500 млю белого вина', type_message='nutrition')
+#     query = chat.handle_create_query(message='Сколько калорий в 500 млю белого вина', type_message='nutrition')
 #     response = await chat.handle_send_message(query)
 #     print(response)
 #     return response
