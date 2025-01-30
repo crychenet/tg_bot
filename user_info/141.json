@@ -1,9 +1,9 @@
 {
-    "weight": 80,
-    "height": 184,
-    "age": 26,
+    "weight": 50,
+    "height": 170,
+    "age": 24,
     "activity": 45,
-    "city": "Paris",
+    "city": "Moscow",
     "water_goal": 2400,
     "calorie_goal": 2500,
     "logged_water": 500,
