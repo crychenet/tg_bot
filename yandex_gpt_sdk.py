@@ -1,33 +1,16 @@
 import asyncio
 import os.path
-import aiofiles
 import json
 import datetime
 from typing import Dict, Any, List, Literal
 from collections import deque
 from yandex_cloud_ml_sdk import AsyncYCloudML
 
-from config import YANDEX_FOLDER_ID
+from utils import StorageManager
+from config import YANDEX_FOLDER_ID, PATH_TO_SYSTEM_PROMPT, PATH_TO_BASE_USERS_INFO
 
-
-PATH_TO_SYSTEM_PROMPT = 'example_yandex_gpt_prompt/system_text.json'
-PATH_TO_BASE_USERS_INFO = 'user_info'
 
 active_user_GPT_session = {}
-
-
-class StorageManager:
-    @staticmethod
-    async def load_json(file_path: str) -> Dict[str, Any]:
-        async with aiofiles.open(file_path, 'r', encoding='utf-8') as f:
-            content = await f.read()
-            return json.loads(content)
-
-    @staticmethod
-    async def save_json(file_path: str, data: Dict[str, Any]):
-        async with aiofiles.open(file_path, 'w', encoding='utf-8') as f:
-            json_data = json.dumps(data, indent=4, ensure_ascii=False)
-            await f.write(json_data)
 
 
 class ChatWithYandexGPT:
@@ -109,7 +92,7 @@ def start_model(temperature: float = 0.5, max_tokens: int = 20):
 
 
 async def get_user_session(user_id: int, model: AsyncYCloudML):
-    global PATH_TO_SYSTEM_PROMPT, PATH_TO_BASE_USERS_INFO
+    # global PATH_TO_SYSTEM_PROMPT, PATH_TO_BASE_USERS_INFO
     if user_id not in active_user_GPT_session:
         active_user_GPT_session[user_id] = await UserChatSession.create(
             model=model,
@@ -140,16 +123,13 @@ async def start_session_cleaner():
         await asyncio.sleep(600)
 
 
-# async def main(message: str, type_message: str):
-#     model = start_model()
-#     chat = await get_user_session(user_id=15523, model=model)
-#     query = chat.handle_create_query(message=message, type_message=type_message)
-#     response = await chat.handle_send_message(query)
-#     print(response)
-#     query = chat.handle_create_query(message='Сколько калорий в 500 млю белого вина', type_message='nutrition')
-#     response = await chat.handle_send_message(query)
-#     print(response)
-#     return response
-#
-#
-# asyncio.run(main())
+async def main(message: str, type_message: str):
+    model = start_model()
+    chat = await get_user_session(user_id=1464672119, model=model)
+    query = chat.handle_create_query(message=message, type_message=type_message)
+    response = await chat.handle_send_message(query)
+    print(response)
+    return response
+
+
+asyncio.run(main('Какая сегодня погода в Москве и какой сегодня день', "general"))
