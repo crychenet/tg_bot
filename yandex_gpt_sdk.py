@@ -103,7 +103,6 @@ async def get_user_session(user_id: int, model: AsyncYCloudML):
 
 
 async def check_activity_session():
-    """delay in seconds"""
     global active_user_GPT_session
     time_now = datetime.datetime.now()
 
@@ -117,19 +116,20 @@ async def check_activity_session():
         del active_user_GPT_session[user_id]
 
 
-async def start_session_cleaner():
+async def start_session_cleaner(delay):
+    """delay in seconds"""
     while True:
         await check_activity_session()
-        await asyncio.sleep(600)
+        await asyncio.sleep(delay)
 
 
-async def main(message: str, type_message: str):
-    model = start_model()
-    chat = await get_user_session(user_id=1464672119, model=model)
-    query = chat.handle_create_query(message=message, type_message=type_message)
-    response = await chat.handle_send_message(query)
-    print(response)
-    return response
-
-
-asyncio.run(main('Какая сегодня погода в Москве и какой сегодня день', "general"))
+# async def main(message: str, type_message: str):
+#     model = start_model()
+#     chat = await get_user_session(user_id=1464672119, model=model)
+#     query = chat.handle_create_query(message=message, type_message=type_message)
+#     response = await chat.handle_send_message(query)
+#     print(response)
+#     return response
+#
+#
+# asyncio.run(main('Какая сегодня погода в Москве и какой сегодня день', "general"))

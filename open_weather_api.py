@@ -20,12 +20,11 @@ async def get_weather_data(geographic_coordinates, api_key):
     return json_resp['main']['temp']
 
 
-async def process_task(city, api_key):
+async def download_weather_data(city, api_key):
     geographic_coordinates = await get_latitude_and_longitude(city, api_key)
     weather_data = await get_weather_data(geographic_coordinates, api_key)
     result = {city: weather_data}
-    print(result)
     return result
 
 
-asyncio.run(process_task('Сочи', OPEN_WEATHER_API_KEY))
+# asyncio.run(download_weather_data('Сочи', OPEN_WEATHER_API_KEY))
