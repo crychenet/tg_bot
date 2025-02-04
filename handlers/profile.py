@@ -131,14 +131,14 @@ async def process_city(message: types.Message, state: FSMContext):
                                                        training_day=False)
 
     calorie_norm = calculate_calorie_intake_rate(weight, height, age)
-    date_now = str(datetime.datetime.now().date())
+    date_now = str(datetime.date.today())
 
     user_data["water_norm_training"] = water_norm_training
     user_data["water_norm_rest"] = water_norm_rest
     user_data["calorie_norm"] = calorie_norm
     user_data["air_temperature"] = air_temperature
-    user_data['calories_logged'] = {date_now: 0}
     user_data['water_logged'] = {date_now: 0}
+    user_data['calories_logged'] = {date_now: 0}
     user_data['calories_burned'] = {date_now: 0}
 
     file_path = os.path.join(PATH_TO_BASE_USERS_INFO, f"{message.from_user.id}.json")

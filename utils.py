@@ -1,8 +1,10 @@
 import asyncio
 import os
+from pathlib import Path
 import datetime
 from config import *
 import aiofiles
+
 from typing import Dict, Any, Optional
 import json
 from open_weather_api import download_weather_data
@@ -57,6 +59,7 @@ def calculate_calorie_intake_rate(weight: float, height: float, age: int):
 async def update_daily_weather_consumption(delay):
     """delay in minutes"""
     while True:
+        await asyncio.sleep(60 * delay)
         for path_to_file in os.listdir(PATH_TO_BASE_USERS_INFO):
             user_data = await StorageManager.load_json(os.path.join(PATH_TO_BASE_USERS_INFO, path_to_file))
             air_temperature = await download_weather_data(user_data['city'], OPEN_WEATHER_API_KEY)
@@ -72,14 +75,13 @@ async def update_daily_weather_consumption(delay):
                 user_data['weight'], user_data['height'], user_data['age']
             )
             await StorageManager.save_json(file_path=os.path.join(PATH_TO_BASE_USERS_INFO, path_to_file), data=user_data)
-        await asyncio.sleep(60 * delay)
 
 
 async def set_up_user_calories_and_water_data(delay: int = 86400) -> None:
     """delay in seconds"""
     while True:
         await asyncio.sleep(delay)
-        date_now = str(datetime.datetime.now().date())
+        date_now = str(datetime.date.today())
         for path_to_file in os.listdir(PATH_TO_BASE_USERS_INFO):
             user_data = await StorageManager.load_json(os.path.join(PATH_TO_BASE_USERS_INFO, path_to_file))
             user_data['calories_logged'][date_now] = 0
@@ -87,3 +89,7 @@ async def set_up_user_calories_and_water_data(delay: int = 86400) -> None:
             user_data['calories_burned'][date_now] = 0
             await StorageManager.save_json(file_path=os.path.join(PATH_TO_BASE_USERS_INFO, path_to_file),
                                            data=user_data)
+
+
+async def file_exists_async(file_path: str) -> bool:
+    return await asyncio.to_thread(Path(file_path).exists)

@@ -2,6 +2,7 @@ import asyncio
 import os.path
 import json
 import datetime
+import sys
 from typing import Dict, Any, List, Literal
 from collections import deque
 from yandex_cloud_ml_sdk import AsyncYCloudML
@@ -125,11 +126,12 @@ async def start_session_cleaner(delay):
 
 # async def main(message: str, type_message: str):
 #     model = start_model()
+#     print(model)
 #     chat = await get_user_session(user_id=1464672119, model=model)
 #     query = chat.handle_create_query(message=message, type_message=type_message)
 #     response = await chat.handle_send_message(query)
 #     print(response)
 #     return response
-#
-#
-# asyncio.run(main('Какая сегодня погода в Москве и какой сегодня день', "general"))
+
+
+asyncio.run(main('Какая сегодня погода в Москве и какой сегодня день', "general"))
