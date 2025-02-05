@@ -7,6 +7,8 @@ import asyncio
 load_dotenv()
 _model_lock = asyncio.Lock()
 
+YANDEX_SDK_MODEL = None
+
 
 YANDEX_FOLDER_ID = os.getenv('YANDEX_FOLDER_ID')
 TG_BOT_TOKEN = os.getenv('BOT_TOKEN')
@@ -38,4 +40,3 @@ async def start_yandex_model(temperature: float = 0.5, max_tokens: int = 20):
             )
     return YANDEX_SDK_MODEL
 
-YANDEX_SDK_MODEL = start_yandex_model()

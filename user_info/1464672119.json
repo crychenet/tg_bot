@@ -2,21 +2,30 @@
     "sex": "М",
     "weight": 85.0,
     "height": 182.0,
-    "age": 25.0,
-    "days_week_of_activity": 3,
-    "average_training_time": 130,
+    "age": 24.0,
+    "days_week_of_activity": 6,
+    "average_training_time": 50,
     "city": "Москва",
-    "water_norm_training": 4716.666666666666,
+    "water_norm_training": 3383.3333333333335,
     "water_norm_rest": 2550.0,
-    "calorie_norm": 1862.5,
-    "air_temperature": 2.63,
+    "calorie_norm": 1867.5,
+    "air_temperature": -0.2,
     "water_logged": {
-        "2025-02-04": 0
+        "2025-02-02": 2000.0,
+        "2025-02-03": 3000.0,
+        "2025-02-04": 2500.0,
+        "2025-02-05": 3400.0
     },
     "calories_logged": {
-        "2025-02-04": 0
+        "2025-02-02": 2990.0,
+        "2025-02-03": 2400.0,
+        "2025-02-04": 2600.0,
+        "2025-02-05": 2700.0
     },
     "calories_burned": {
-        "2025-02-04": 0
+        "2025-02-02": 578.0,
+        "2025-02-03": 764.0,
+        "2025-02-04": 833.0,
+        "2025-02-05": 515.0
     }
 }

@@ -94,8 +94,10 @@ async def set_up_user_calories_and_water_data(delay: int = 86400) -> None:
                                            data=user_data)
 
 
-async def file_exists_async(file_path: str) -> bool:
-    return await asyncio.to_thread(Path(file_path).exists)
+async def file_exists_async(general_path: str, user_path: str) -> bool:
+    general_path = Path(general_path)
+    file_path = Path(__file__).parent / general_path / user_path
+    return await asyncio.to_thread(file_path.exists)
 
 
 async def ask_question(message: types.Message, state: FSMContext, question: str, next_state: State):

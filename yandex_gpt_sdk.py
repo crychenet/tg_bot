@@ -8,8 +8,9 @@ from collections import deque
 from yandex_cloud_ml_sdk import AsyncYCloudML
 
 from utils import StorageManager
-from config import YANDEX_FOLDER_ID, PATH_TO_SYSTEM_PROMPT, PATH_TO_BASE_USERS_INFO, YANDEX_SDK_MODEL
+from config import YANDEX_FOLDER_ID, PATH_TO_SYSTEM_PROMPT, PATH_TO_BASE_USERS_INFO, start_yandex_model
 
+YANDEX_SDK_MODEL = None
 
 
 class ChatWithYandexGPT:
@@ -113,12 +114,16 @@ class SessionManager:
         return self.active_sessions
 
 
-async def main(message: str, type_message: str):
+async def simple_request(message: str, type_message: str, user_id: int):
+    global YANDEX_SDK_MODEL
+    YANDEX_SDK_MODEL = await start_yandex_model()
     sessions = SessionManager()
-    session = await sessions.get_user_session(1464672119)
+    session = await sessions.get_user_session(user_id)
     query = session.handle_create_query(message, type_message)
     result = await session.handle_send_message(query)
-    print(result)
+    return result
 
 
-asyncio.run(main('Ты крутой?', "general"))
+# asyncio.run(main('Ты крутой?', "general"))
+
+
