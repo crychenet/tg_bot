@@ -43,12 +43,16 @@ async def log_food_amount(message: types.Message, state: FSMContext):
         return
     await state.update_data(waiting_for_food_amount=valid_message)
     food_user_data = await state.get_data()
+    print(f'{food_user_data=}')
 
     food_calories = await simple_request(
         message=json.dumps(food_user_data, ensure_ascii=False),
         type_message='calorie_count',
         user_id=message.from_user.id
     )
+
+    print(f'{food_calories.alternatives[0].text=}')
+
     valid_food_calories = convert_to_valid_digit(food_calories.alternatives[0].text)
 
     date_now = str(datetime.date.today())

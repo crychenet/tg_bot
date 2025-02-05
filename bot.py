@@ -1,3 +1,7 @@
+import asyncio
+import os
+import json
+
 from config import TG_BOT_TOKEN
 from aiogram import Bot, Dispatcher
 from aiogram.fsm.storage.memory import MemoryStorage
@@ -37,7 +41,7 @@ logging.basicConfig(
         logging.StreamHandler(sys.stdout)
     ]
 )
-logging.getLogger("aiogram").setLevel(logging.INFO)
+logging.getLogger("aiogram").setLevel(logging.WARNING)
 logger = logging.getLogger(__name__)
 
 

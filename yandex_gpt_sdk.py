@@ -21,11 +21,12 @@ class ChatWithYandexGPT:
             self,
             message: str,
             base_user_info: Dict[str, Any],
-            type_message: Literal["general", "physical_activity", "nutrition"],
+            type_message: str,
             last_responses: deque,
     ) -> List[Dict[str, str]]:
         query = [
-            {"role": "system", "text": 'Базовая информация о пользователе' + json.dumps(base_user_info, ensure_ascii=False)},
+            {"role": "system", "text": 'Базовая информация о пользователе' + json.dumps(base_user_info,
+                                                                                        ensure_ascii=False)},
             {"role": "system", "text": self.system_prompt.get(type_message, "")},
             {"role": "user", "text": message},
         ]
@@ -61,7 +62,9 @@ class UserChatSession:
 
     def handle_create_query(
             self, message: str,
-            type_message: Literal["general", "physical_activity", "nutrition"]
+            type_message: Literal[
+                "general", "physical_activity", "nutrition",
+                "calorie_count", "calorie_burn", "suggest_workout", "suggest_meal"]
     ) -> List[Dict[str, Any]]:
 
         query = self.chat_instance.create_query(
@@ -77,7 +80,7 @@ class UserChatSession:
             model=self.model,
             message=query,
         )
-        self.last_responses.append({"role": "assistant", "text": response.alternatives[0].text})
+        # self.last_responses.append({"role": "assistant", "text": response.alternatives[0].text})
         self.last_activity = datetime.datetime.now()
         return response
 
@@ -124,6 +127,13 @@ async def simple_request(message: str, type_message: str, user_id: int):
     return result
 
 
-# asyncio.run(main('Ты крутой?', "general"))
-
-
+# async def main():
+#     first = await simple_request(
+#         "{'Вид тренировки': 'Бег', 'длительность тренировки': 50.0}",
+#         "calorie_burn", 1464672119)
+#     print(first)
+#     second = await simple_request(
+#         "{'Блюдо': 'Банан', 'Съеденно грамм': 300.0}",
+#         "calorie_count", 1464672119)
+#     print(second)
+# asyncio.run(main())

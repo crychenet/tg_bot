@@ -43,13 +43,15 @@ async def log_workout_duration(message: types.Message, state: FSMContext):
         await message.answer("Пожалуйста, введите число больше 0")
         return
     await state.update_data(waiting_for_workout_duration=valid_message)
-    workout_user_data = await state.get_data()
 
+    workout_user_data = await state.get_data()
+    print(f'{workout_user_data=}')
     calories_burned = await simple_request(
         message=json.dumps(workout_user_data, ensure_ascii=False),
         type_message='calorie_burn',
         user_id=message.from_user.id
     )
+    print(f"{calories_burned.alternatives[0].text=}")
     valid_calories_burned = convert_to_valid_digit(calories_burned.alternatives[0].text)
 
     date_now = str(datetime.date.today())
