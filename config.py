@@ -13,7 +13,6 @@ TG_BOT_TOKEN = os.getenv('BOT_TOKEN')
 PATH_TO_SYSTEM_PROMPT = os.getenv('PATH_TO_SYSTEM_PROMPT')
 PATH_TO_BASE_USERS_INFO = os.getenv('PATH_TO_BASE_USERS_INFO')
 OPEN_WEATHER_API_KEY = os.getenv('OPEN_WEATHER_API_KEY')
-YANDEX_SDK_MODEL = None
 
 required_vars = {
     "YANDEX_FOLDER_ID": YANDEX_FOLDER_ID,
@@ -38,3 +37,5 @@ async def start_yandex_model(temperature: float = 0.5, max_tokens: int = 20):
                 temperature=temperature, max_tokens=max_tokens
             )
     return YANDEX_SDK_MODEL
+
+YANDEX_SDK_MODEL = start_yandex_model()

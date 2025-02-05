@@ -23,11 +23,6 @@ class ProfileSetup(StatesGroup):
     calorie_goal = State()
 
 
-async def ask_question(message: types.Message, state: FSMContext, question: str, next_state: State):
-    await message.answer(question)
-    await state.set_state(next_state)
-
-
 @profile_router.message(Command("set_profile"))
 async def cmd_set_profile(message: types.Message, state: FSMContext):
     await ask_question(message, state, "Введите ваш пол (М/Ж):", ProfileSetup.sex)

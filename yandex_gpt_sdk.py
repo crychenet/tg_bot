@@ -8,10 +8,8 @@ from collections import deque
 from yandex_cloud_ml_sdk import AsyncYCloudML
 
 from utils import StorageManager
-from config import YANDEX_FOLDER_ID, PATH_TO_SYSTEM_PROMPT, PATH_TO_BASE_USERS_INFO
+from config import YANDEX_FOLDER_ID, PATH_TO_SYSTEM_PROMPT, PATH_TO_BASE_USERS_INFO, YANDEX_SDK_MODEL
 
-
-active_user_GPT_session = {}
 
 
 class ChatWithYandexGPT:
@@ -83,55 +81,44 @@ class UserChatSession:
         return response
 
 
-def start_model(temperature: float = 0.5, max_tokens: int = 20):
-    sdk = AsyncYCloudML(
-        folder_id=YANDEX_FOLDER_ID,
-    )
-    model = sdk.models.completions("yandexgpt")
-    model = model.configure(temperature=temperature, max_tokens=max_tokens)
-    return model
+class SessionManager:
+    _instances = None
+
+    def __new__(cls):
+        if cls._instances is None:
+            cls._instances = super(SessionManager, cls).__new__(cls)
+            cls._instances.active_sessions = {}
+        return cls._instances
+
+    async def get_user_session(self, user_id: int):
+        if user_id not in self.active_sessions:
+            self.active_sessions[user_id] = await UserChatSession.create(
+                model=YANDEX_SDK_MODEL,
+                path_to_system_prompt=PATH_TO_SYSTEM_PROMPT,
+                path_to_base_user_info=os.path.join(PATH_TO_BASE_USERS_INFO, f"{user_id}.json"),
+            )
+        return self.active_sessions[user_id]
+
+    async def remove_inactive_sessions(self):
+        time_now = datetime.datetime.now()
+        inactive_users = [
+            user_id for user_id, session in self.active_sessions.items()
+            if time_now - session.last_activity > datetime.timedelta(minutes=30)
+        ]
+        for user_id in inactive_users:
+            await self.active_sessions[user_id].save_session()
+            del self.active_sessions[user_id]
+
+    def get_active_sessions(self) -> Dict[int, UserChatSession]:
+        return self.active_sessions
 
 
-async def get_user_session(user_id: int, model: AsyncYCloudML):
-    # global PATH_TO_SYSTEM_PROMPT, PATH_TO_BASE_USERS_INFO
-    if user_id not in active_user_GPT_session:
-        active_user_GPT_session[user_id] = await UserChatSession.create(
-            model=model,
-            path_to_system_prompt=PATH_TO_SYSTEM_PROMPT,
-            path_to_base_user_info=os.path.join(PATH_TO_BASE_USERS_INFO, str(user_id) + '.json')
-        )
-    return active_user_GPT_session[user_id]
+async def main(message: str, type_message: str):
+    sessions = SessionManager()
+    session = await sessions.get_user_session(1464672119)
+    query = session.handle_create_query(message, type_message)
+    result = await session.handle_send_message(query)
+    print(result)
 
 
-async def check_activity_session():
-    global active_user_GPT_session
-    time_now = datetime.datetime.now()
-
-    inactive_users = [
-        user_id for user_id, session in active_user_GPT_session.items()
-        if time_now - session.last_activity > datetime.timedelta(minutes=30)
-    ]
-
-    for user_id in inactive_users:
-        await active_user_GPT_session[user_id].save_session()
-        del active_user_GPT_session[user_id]
-
-
-async def start_session_cleaner(delay):
-    """delay in seconds"""
-    while True:
-        await check_activity_session()
-        await asyncio.sleep(delay)
-
-
-# async def main(message: str, type_message: str):
-#     model = start_model()
-#     print(model)
-#     chat = await get_user_session(user_id=1464672119, model=model)
-#     query = chat.handle_create_query(message=message, type_message=type_message)
-#     response = await chat.handle_send_message(query)
-#     print(response)
-#     return response
-
-
-asyncio.run(main('Какая сегодня погода в Москве и какой сегодня день', "general"))
+asyncio.run(main('Ты крутой?', "general"))

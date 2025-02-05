@@ -4,6 +4,9 @@ from pathlib import Path
 import datetime
 from config import *
 import aiofiles
+from aiogram import types, Router, F
+from aiogram.fsm.context import FSMContext
+from aiogram.fsm.state import StatesGroup, State
 
 from typing import Dict, Any, Optional
 import json
@@ -93,3 +96,8 @@ async def set_up_user_calories_and_water_data(delay: int = 86400) -> None:
 
 async def file_exists_async(file_path: str) -> bool:
     return await asyncio.to_thread(Path(file_path).exists)
+
+
+async def ask_question(message: types.Message, state: FSMContext, question: str, next_state: State):
+    await message.answer(question)
+    await state.set_state(next_state)
