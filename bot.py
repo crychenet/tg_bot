@@ -1,10 +1,7 @@
-import asyncio
-import os
-import json
-
 from config import TG_BOT_TOKEN
 from aiogram import Bot, Dispatcher
 from aiogram.fsm.storage.memory import MemoryStorage
+import logging
 
 from yandex_gpt_sdk import *
 from handlers.profile import profile_router
@@ -17,6 +14,7 @@ from handlers.check_progress import check_progress_router
 from handlers.suggest_workout import suggest_workout_router
 from handlers.suggest_meal import suggest_meal_router
 from handlers.check_progress_graph import check_progress_graphs_router
+from middlewares.logging_middleware import LoggingMiddleware
 
 from utils import update_daily_weather_consumption, set_up_user_calories_and_water_data
 
@@ -27,6 +25,20 @@ dp.include_routers(profile_router, start_router, help_router,
                    log_water_router, log_food_router, log_workout_router,
                    check_progress_router, suggest_workout_router,
                    suggest_meal_router, check_progress_graphs_router)
+dp.message.middleware(LoggingMiddleware())
+dp.callback_query.middleware(LoggingMiddleware())
+
+
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s | %(levelname)s | %(message)s",
+    datefmt="%b %d %I:%M:%S %p",
+    handlers=[
+        logging.StreamHandler(sys.stdout)
+    ]
+)
+logging.getLogger("aiogram").setLevel(logging.INFO)
+logger = logging.getLogger(__name__)
 
 
 async def main():
